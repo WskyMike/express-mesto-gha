@@ -32,10 +32,16 @@ function deleteCard(req, res) {
           .send({ message: 'Недостаточно прав' });
       }
     })
-    .catch(() => {
-      res
-        .status(500)
-        .send({ message: 'Произошла ошибка' });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res
+          .status(400)
+          .send({ message: 'Переданы некорректные данные при удалении карточки' });
+      } else {
+        res
+          .status(500)
+          .send({ message: 'Произошла ошибка' });
+      }
     });
 }
 
@@ -68,16 +74,16 @@ function likeCard(req, res) {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .orFail(() => {
-      res
-        .status(400)
-        .send({ message: 'Переданы некорректные данные для лайка' });
-    })
+    .orFail(() => res.status(404).send({ message: 'Карточка с таким ID не найдена' }))
     .then((like) => res.send(like))
-    .catch(() => {
-      res
-        .status(500)
-        .send({ message: 'Произошла ошибка' });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res
+          .status(400).send({ message: 'Переданы некорректные данные для добавления лайка' });
+      } else {
+        res
+          .status(500).send({ message: 'Произошла ошибка' });
+      }
     });
 }
 
@@ -88,16 +94,16 @@ function dislikeCard(req, res) {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
-    .orFail(() => {
-      res
-        .status(400)
-        .send({ message: 'Переданы некорректные данные лайка' });
-    })
-    .then((likes) => res.send(likes))
-    .catch(() => {
-      res
-        .status(500)
-        .send({ message: 'Произошла ошибка' });
+    .orFail(() => res.status(404).send({ message: 'Карточка с таким ID не найдена' }))
+    .then((like) => res.send(like))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res
+          .status(400).send({ message: 'Переданы некорректные данные для удаления лайка' });
+      } else {
+        res
+          .status(500).send({ message: 'Произошла ошибка' });
+      }
     });
 }
 

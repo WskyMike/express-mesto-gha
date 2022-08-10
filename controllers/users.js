@@ -49,7 +49,7 @@ function updateUser(req, res) {
   const { name, about } = req.body;
   const userId = req.user._id;
 
-  User.findByIdAndUpdate(userId, { name, about }, { new: true })
+  User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
     .orFail(() => res.status(404).send({ message: 'Пользователь с таким ID не найден' }))
     .then((user) => res.send(user))
     .catch((err) => {
@@ -70,7 +70,7 @@ function updateAvatar(req, res) {
   const { avatar } = req.body;
   const userId = req.user._id;
 
-  User.findByIdAndUpdate(userId, { avatar }, { new: true })
+  User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .orFail(() => res.status(404).send({ message: 'Пользователь с таким ID не найден' }))
     .then((avatarData) => res.send(avatarData))
     .catch((err) => {
