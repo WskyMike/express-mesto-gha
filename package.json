@@ -1,8 +1,8 @@
 {
   "name": "express-mesto-gha",
   "version": "1.0.0",
-  "description": "backend on express",
-  "main": "index.js",
+  "description": "[![Tests for sprint 13](https://github.com/WskyMike/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/WskyMike/express-mesto-gha/actions/workflows/tests-13-sprint.yml) ",
+  "main": "app.js",
   "scripts": {
     "start": "node ./app.js",
     "dev": "nodemon ./app.js",
