@@ -7,7 +7,7 @@ function getCards(req, res) {
     .catch(() => {
       res
         .status(500)
-        .send({ message: 'Произошла ошибка' });
+        .send({ message: 'На сервере произошла ошибка' });
     });
 }
 
@@ -40,7 +40,7 @@ function deleteCard(req, res) {
       } else {
         res
           .status(500)
-          .send({ message: 'Произошла ошибка' });
+          .send({ message: 'На сервере произошла ошибка' });
       }
     });
 }
@@ -62,7 +62,7 @@ function createCard(req, res) {
       } else {
         res
           .status(500)
-          .send({ message: 'Произошла ошибка' });
+          .send({ message: 'На сервере произошла ошибка' });
       }
     });
 }
@@ -82,7 +82,7 @@ function likeCard(req, res) {
           .status(400).send({ message: 'Переданы некорректные данные для добавления лайка' });
       } else {
         res
-          .status(500).send({ message: 'Произошла ошибка' });
+          .status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 }
@@ -102,7 +102,7 @@ function dislikeCard(req, res) {
           .status(400).send({ message: 'Переданы некорректные данные для удаления лайка' });
       } else {
         res
-          .status(500).send({ message: 'Произошла ошибка' });
+          .status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 }
