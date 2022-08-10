@@ -33,3 +33,8 @@ const { cardRouter } = require('./routes/cards');
 
 app.use('/', userRouter);
 app.use('/', cardRouter);
+
+// Обработка неправильного пути
+app.use('*', (req, res) => {
+  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+});
