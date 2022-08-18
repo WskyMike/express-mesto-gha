@@ -22,11 +22,6 @@ function getUserById(req, res, next) {
       throw new NotFound('Пользователь с таким ID не найден');
     })
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные для поиска пользователя');
-      }
-    })
     .catch(next);
 }
 
