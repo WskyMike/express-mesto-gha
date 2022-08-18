@@ -60,18 +60,10 @@ function likeCard(req, res, next) {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .orFail()
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new NotFound('Карточка с таким ID не найдена');
-      }
+    .orFail(() => {
+      throw new NotFound('Карточка с таким ID не найдена');
     })
     .then((like) => res.send(like))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные для постановки лайка');
-      }
-    })
     .catch(next);
 }
 
@@ -82,18 +74,10 @@ function dislikeCard(req, res, next) {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
-    .orFail()
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new NotFound('Карточка с таким ID не найдена');
-      }
+    .orFail(() => {
+      throw new NotFound('Карточка с таким ID не найдена');
     })
     .then((like) => res.send(like))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные для снятия лайка');
-      }
-    })
     .catch(next);
 }
 
