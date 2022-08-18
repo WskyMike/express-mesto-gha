@@ -4,9 +4,15 @@ const rateLimit = require('express-rate-limit');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
 
 const app = express();
 const { PORT } = process.env;
+
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // DDoS protector
 const limiter = rateLimit({
@@ -23,11 +29,39 @@ const helmet = require('helmet');
 
 app.use(helmet());
 
-// Временное решение авторизации
-app.use((req, res, next) => {
-  req.user = {
-    _id: '62f0bcfe8c4f431c85df63ff',
-  };
+// Роуты
+const { userRouter } = require('./routes/users');
+const { cardRouter } = require('./routes/cards');
+const { logIn, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const { loginValidation, userValidation } = require('./middlewares/validate');
+
+app.post('/signin', loginValidation, logIn);
+app.post('/signup', userValidation, createUser);
+
+app.use('/', auth, userRouter);
+app.use('/', auth, cardRouter);
+
+// Обработка неправильного пути
+const NotFound = require('./errors/NotFound');
+
+app.use('*', () => {
+  throw new NotFound('Запрашиваемый ресурс не найден');
+});
+
+// Централизованная обработка ошибок
+app.use(errors()); // JOI
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
   next();
 });
 
@@ -39,18 +73,3 @@ async function connection() {
   console.log(`Example app listening on port ${PORT}`);
 }
 connection();
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Роуты
-const { userRouter } = require('./routes/users');
-const { cardRouter } = require('./routes/cards');
-
-app.use('/', userRouter);
-app.use('/', cardRouter);
-
-// Обработка неправильного пути
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
-});

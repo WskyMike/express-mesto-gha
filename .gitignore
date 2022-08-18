@@ -6,7 +6,6 @@ npm-debug.log*
 # Dependency directory
 node_modules
 async__await
-errors
 requests
 
 # Optional npm cache directory
