@@ -1,8 +1,9 @@
 /* eslint-disable func-names */
-// const bcrypt = require('bcrypt');
 const { Schema, model } = require('mongoose');
 const { isEmail } = require('validator');
 const bcrypt = require('bcrypt');
+const { linkRegExp } = require('../middlewares/validate');
+const Auth = require('../errors/Auth');
 
 const userSchema = new Schema({
   name: {
@@ -19,6 +20,12 @@ const userSchema = new Schema({
   },
   avatar: {
     type: String,
+    validate: {
+      validator(link) {
+        return linkRegExp.test(link);
+      },
+      message: 'Здесь должна быть ссылка',
+    },
     default: 'https://esquire.kz/wp-content/uploads/2019/06/e5d59868-71df-4389-bb85-9ba52baa934a.jpeg',
   },
   email: {
@@ -26,7 +33,9 @@ const userSchema = new Schema({
     required: true,
     unique: true,
     validate: {
-      validator: (v) => isEmail(v),
+      validator(email) {
+        return isEmail(email);
+      },
     },
   },
   password: {
@@ -36,7 +45,7 @@ const userSchema = new Schema({
     select: false, // По умолчанию хеш пароля пользователя не будет возвращаться из базы.
   },
 }, {
-  versionKey: false,
+  versionKey: false, // убрать версию из схемы
 });
 
 // В случае аутентификации вернем хэш пароля
@@ -44,17 +53,14 @@ userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        // ERR
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        throw new Auth('Неправильные почта или пароль');
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            // ERR
-            return Promise.reject(new Error('Неправильные почта или пароль'));
+            throw new Auth('Неправильные почта или пароль');
           }
-
           return user;
         });
     });

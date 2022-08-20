@@ -43,19 +43,19 @@ function createUser(req, res, next) {
       email,
       password: hash,
     }))
-    .then((user) => res.send({
-      data: {
+    .then((user) => {
+      res.send({
         name: user.name,
         about: user.about,
         avatar: user.avatar,
         email: user.email,
-      },
-    }))
+      });
+    })
     .catch((err) => {
-      if (err.code === 11000) {
+      if (err.name === 'ValidationError') {
+        throw new BadRequest('Ошибка введенных данных');
+      } else if (err.code === 11000) {
         throw new Conflict('Пользователь с таким e-mail уже существует');
-      } else if (err.name === 'ValidationError') {
-        throw new BadRequest('Переданы некорректные данные при создании пользователя');
       }
     })
     .catch(next);

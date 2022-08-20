@@ -20,7 +20,7 @@ const userValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(20),
-    avatar: Joi.string().required().pattern(linkRegExp),
+    avatar: Joi.string().pattern(linkRegExp),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),

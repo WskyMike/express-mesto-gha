@@ -6,6 +6,14 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
+const helmet = require('helmet');
+
+const { userRouter } = require('./routes/users');
+const { cardRouter } = require('./routes/cards');
+const { logIn, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const { loginValidation, userValidation } = require('./middlewares/validate');
+const NotFound = require('./errors/NotFound');
 
 const app = express();
 const { PORT } = process.env;
@@ -25,17 +33,9 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Сonfiguring headers for protection
-const helmet = require('helmet');
-
 app.use(helmet());
 
 // Роуты
-const { userRouter } = require('./routes/users');
-const { cardRouter } = require('./routes/cards');
-const { logIn, createUser } = require('./controllers/users');
-const auth = require('./middlewares/auth');
-const { loginValidation, userValidation } = require('./middlewares/validate');
-
 app.post('/signin', loginValidation, logIn);
 app.post('/signup', userValidation, createUser);
 
@@ -43,11 +43,18 @@ app.use('/', auth, userRouter);
 app.use('/', auth, cardRouter);
 
 // Обработка неправильного пути
-const NotFound = require('./errors/NotFound');
-
 app.use('*', () => {
   throw new NotFound('Запрашиваемый ресурс не найден');
 });
+
+// Подключение к MongoDB
+async function connection() {
+  await mongoose.connect('mongodb://localhost:27017/mestodb');
+  console.log('Connected to DB');
+  await app.listen(PORT);
+  console.log(`Example app listening on port ${PORT}`);
+}
+connection();
 
 // Централизованная обработка ошибок
 app.use(errors()); // JOI
@@ -64,12 +71,3 @@ app.use((err, req, res, next) => {
     });
   next();
 });
-
-// Подключение к MongoDB
-async function connection() {
-  await mongoose.connect('mongodb://localhost:27017/mestodb');
-  console.log('Connected to DB');
-  await app.listen(PORT);
-  console.log(`Example app listening on port ${PORT}`);
-}
-connection();
