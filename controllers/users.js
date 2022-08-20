@@ -68,6 +68,7 @@ function updateUser(req, res, next) {
     })
     .catch(next);
 }
+
 // Обновить аватар
 function updateAvatar(req, res, next) {
   const { avatar } = req.body;
@@ -100,16 +101,18 @@ function logIn(req, res, next) {
     })
     .catch(next);
 }
+
 // Получить инфо текущего пользователя
-const getCurrentUser = (req, res, next) => {
+function getCurrentUser(req, res, next) {
   User.findById(req.user._id)
     .orFail()
     .catch(() => {
-      throw new NotFound('Пользователь с таким ID не найден');
+      throw new NotFound('Пользователь с таким id не найден');
     })
-    .then((currentUser) => res.send(currentUser))
+    .then((currentUser) => res.send({ currentUser }))
     .catch(next);
-};
+}
+
 module.exports = {
   createUser,
   getUsers,

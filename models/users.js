@@ -25,7 +25,7 @@ const userSchema = new Schema({
       },
       message: 'Здесь должна быть ссылка',
     },
-    default: 'https://esquire.kz/wp-content/uploads/2019/06/e5d59868-71df-4389-bb85-9ba52baa934a.jpeg',
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
   email: {
     type: String,
