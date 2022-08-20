@@ -36,8 +36,8 @@ const { loginValidation, userValidation } = require('./middlewares/validate');
 app.post('/signin', loginValidation, logIn);
 app.post('/signup', userValidation, createUser);
 
-app.use('/', userRouter);
-app.use('/', cardRouter);
+app.use('/', auth, userRouter);
+app.use('/', auth, cardRouter);
 
 // Обработка неправильного пути
 const NotFound = require('./errors/NotFound');
