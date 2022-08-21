@@ -57,6 +57,7 @@ function createUser(req, res, next) {
     .catch(next);
 }
 // Обновить юзера
+// > > > > > > > Через Постман запрос проходит отлично. Через тесты на ГитХабе - нет. < < < < < < <
 function updateUser(req, res, next) {
   const { name, about } = req.body;
   const userId = req.user._id;
