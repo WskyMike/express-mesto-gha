@@ -6,6 +6,7 @@ const Auth = require('../errors/Auth');
 const BadRequest = require('../errors/BadRequest');
 const NotFound = require('../errors/NotFound');
 const Conflict = require('../errors/Conflict');
+
 // Получить всех юзеров из БД
 function getUsers(req, res, next) {
   User.find({})
@@ -84,16 +85,18 @@ function updateAvatar(req, res, next) {
 }
 function logIn(req, res, next) {
   const { email, password } = req.body;
+
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'secret-key', {
-        expiresIn: '7d',
-      });
-      res
-        .cookie('jwt', token, {
-          maxAge: 604800 * 24 * 7,
-          httpOnly: true,
-        })
+      const token = jwt.sign(
+        { _id: user._id },
+        'secret-key',
+        { expiresIn: '7d' },
+      );
+      res.cookie('jwt', token, {
+        maxAge: 604800 * 24 * 7,
+        httpOnly: true,
+      })
         .send({ message: 'Авторизация прошла успешно!' });
     })
     .catch(() => {
@@ -105,11 +108,10 @@ function logIn(req, res, next) {
 // Получить инфо текущего пользователя
 function getCurrentUser(req, res, next) {
   User.findById(req.user._id)
-    .orFail()
-    .catch(() => {
-      throw new NotFound('Пользователь с таким id не найден');
+    .orFail(() => {
+      throw new NotFound('Пользователь с таким ID не найден');
     })
-    .then((currentUser) => res.send({ currentUser }))
+    .then((user) => res.send(user))
     .catch(next);
 }
 

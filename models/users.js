@@ -3,6 +3,7 @@ const { Schema, model } = require('mongoose');
 const { isEmail } = require('validator');
 const bcrypt = require('bcrypt');
 const { linkRegExp } = require('../middlewares/validate');
+const Auth = require('../errors/Auth');
 
 const userSchema = new Schema({
   name: {
@@ -53,14 +54,14 @@ userSchema.statics.findUserByCredentials = function (email, password) {
     .then((user) => {
       if (!user) {
         // ERR
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        throw new Auth('Неправильные почта или пароль');
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
             // ERR
-            return Promise.reject(new Error('Неправильные почта или пароль'));
+            throw new Auth('Неправильные почта или пароль');
           }
 
           return user;
