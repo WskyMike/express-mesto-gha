@@ -3,6 +3,11 @@ const Auth = require('../errors/Auth');
 
 function auth(req, res, next) {
   const token = req.cookies.jwt;
+
+  if (!token) {
+    throw new Auth('Необходима авторизация');
+  }
+
   let payload;
 
   try {

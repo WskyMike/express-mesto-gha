@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/users');
 // ERRORS
-const Auth = require('../errors/Auth');
+// const Auth = require('../errors/Auth');
 const BadRequest = require('../errors/BadRequest');
 const NotFound = require('../errors/NotFound');
 const Conflict = require('../errors/Conflict');
@@ -13,6 +13,7 @@ function getUsers(req, res, next) {
     .then((users) => res.send(users))
     .catch(next);
 }
+
 // Найти юзера по ID
 function getUserById(req, res, next) {
   User.findById(req.params._id)
@@ -20,8 +21,15 @@ function getUserById(req, res, next) {
       throw new NotFound('Пользователь с таким ID не найден');
     })
     .then((user) => res.send(user))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные для поиска пользователя'));
+      } else {
+        next(err);
+      }
+    });
 }
+
 // Cоздать юзера
 function createUser(req, res, next) {
   const {
@@ -49,12 +57,13 @@ function createUser(req, res, next) {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        throw new Conflict('Пользователь с таким e-mail уже существует');
+        next(new Conflict('Пользователь с таким e-mail уже существует'));
       } else if (err.name === 'ValidationError') {
-        throw new BadRequest('Переданы некорректные данные при создании пользователя');
+        next(new BadRequest('Переданы некорректные данные при создании пользователя'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 }
 // Обновить юзера
 // > > > > > > > Через Постман запрос проходит отлично. Через тесты на ГитХабе - нет. < < < < < < <
@@ -65,10 +74,11 @@ function updateUser(req, res, next) {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Переданы некорректные данные при обновлении пользователя');
+        next(new BadRequest('Переданы некорректные данные при обновлении пользователя'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 }
 
 // Обновить аватар
@@ -79,11 +89,13 @@ function updateAvatar(req, res, next) {
     .then((avatarData) => res.send(avatarData))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Переданы некорректные данные при обновлении аватара');
+        next(new BadRequest('Переданы некорректные данные при обновлении аватара'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 }
+// Залогиниться
 function logIn(req, res, next) {
   const { email, password } = req.body;
 
@@ -99,9 +111,6 @@ function logIn(req, res, next) {
         httpOnly: true,
       })
         .send({ message: 'Авторизация прошла успешно!' });
-    })
-    .catch(() => {
-      throw new Auth('Ошибка авторизации');
     })
     .catch(next);
 }

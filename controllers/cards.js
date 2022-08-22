@@ -18,19 +18,25 @@ function deleteCard(req, res, next) {
   const cardId = req.params._id;
 
   Card.findById(cardId)
-    .orFail()
-    .catch(() => {
+    .orFail(() => {
       throw new NotFound('Карточка с таким id не найдена');
     })
     .then((card) => {
       if (card.owner.toString() === userId) {
         Card.findByIdAndRemove(cardId)
-          .then((cardData) => res.send(cardData));
+          .then((cardData) => res.send(cardData))
+          .catch(next);
       } else {
         throw new Forbidden('Недостаточно прав!');
       }
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные при удалении карточки'));
+      } else {
+        next(err);
+      }
+    });
 }
 
 // Создать карточку
@@ -59,7 +65,13 @@ function likeCard(req, res, next) {
       throw new NotFound('Карточка с таким ID не найдена');
     })
     .then((like) => res.send(like))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные для добавления лайка'));
+      } else {
+        next(err);
+      }
+    });
 }
 
 // Удалить лайк
@@ -73,7 +85,13 @@ function dislikeCard(req, res, next) {
       throw new NotFound('Карточка с таким ID не найдена');
     })
     .then((like) => res.send(like))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные для снятия лайка'));
+      } else {
+        next(err);
+      }
+    });
 }
 
 module.exports = {
