@@ -26,6 +26,11 @@ const helmet = require('helmet');
 
 app.use(helmet());
 
+// Логгирование
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+
+app.use(requestLogger); // Запросы
+
 // Роуты
 const { userRouter } = require('./routes/users');
 const { cardRouter } = require('./routes/cards');
@@ -45,6 +50,8 @@ const NotFound = require('./errors/NotFound');
 app.use('*', () => {
   throw new NotFound('Запрашиваемый ресурс не найден');
 });
+
+app.use(errorLogger); // Ошибки
 
 // Централизованная обработка ошибок
 app.use(errors()); // JOI
