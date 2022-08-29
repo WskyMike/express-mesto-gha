@@ -9,6 +9,15 @@ const { errors } = require('celebrate');
 
 const app = express();
 const { PORT = 3000 } = process.env;
+
+const cors = require('cors');
+
+app.use(cors()); // enables CORS action for all routes as no argument has been passed.
+
+app.get('/', (req, res) => {
+  res.json({ msg: 'This is CORS-enabled for all origins!' });
+});
+
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
