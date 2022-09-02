@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/users');
+
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 // ERRORS
 // const Auth = require('../errors/Auth');
 const BadRequest = require('../errors/BadRequest');
@@ -66,7 +69,6 @@ function createUser(req, res, next) {
     });
 }
 // Обновить юзера
-// > > > > > > > Через Постман запрос проходит отлично. Через тесты на ГитХабе - нет. < < < < < < <
 function updateUser(req, res, next) {
   const { name, about } = req.body;
   const userId = req.user._id;
@@ -101,16 +103,17 @@ function logIn(req, res, next) {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        'secret-key',
-        { expiresIn: '7d' },
-      );
-      res.cookie('jwt', token, {
-        maxAge: 604800 * 24 * 7,
-        httpOnly: true,
-      })
-        .send({ message: 'Авторизация прошла успешно!' });
+      res.send({
+        token: jwt.sign(
+          { _id: user._id },
+          NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
+          { expiresIn: '7d' },
+        ),
+      });
+      // .cookie('jwt', token, {
+      //   maxAge: 604800 * 24 * 7,
+      //   httpOnly: true,
+      // })
     })
     .catch(next);
 }

@@ -4,21 +4,23 @@ const rateLimit = require('express-rate-limit');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
+// const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 
 const app = express();
 const { PORT = 3000 } = process.env;
 
+// CORS
 const cors = require('cors');
 
-app.use(cors()); // enables CORS action for all routes as no argument has been passed.
+const corsOptions = {
+  origin: 'http://localhost:3001',
+  credentials: true,
+};
 
-app.get('/', (req, res) => {
-  res.json({ msg: 'This is CORS-enabled for all origins!' });
-});
+app.use(cors(corsOptions)); // если не указать corsOptions, то запросы смогут слать все
 
-app.use(cookieParser());
+// app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // DDoS protector
@@ -46,6 +48,12 @@ const { cardRouter } = require('./routes/cards');
 const { logIn, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const { loginValidation, userValidation } = require('./middlewares/validate');
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
 app.post('/signin', loginValidation, logIn);
 app.post('/signup', userValidation, createUser);
