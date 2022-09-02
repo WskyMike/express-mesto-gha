@@ -13,12 +13,12 @@ const { PORT = 3000 } = process.env;
 // CORS
 const cors = require('cors');
 
-const corsOptions = {
-  origin: 'https://mesto.front.nomorepartiesxyz.ru',
-  credentials: true,
-};
+// const corsOptions = {
+//   origin: 'https://mesto.front.nomorepartiesxyz.ru',
+//   credentials: true,
+// };
 
-app.use(cors(corsOptions)); // если не указать corsOptions, то запросы смогут слать все
+app.use(cors()); // если не указать corsOptions, то запросы смогут слать все
 
 // app.use(cookieParser());
 app.use(bodyParser.json());
