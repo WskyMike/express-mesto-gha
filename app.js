@@ -17,7 +17,7 @@ const corsOptions = {
   origin: [
     'https://mesto.front.nomorepartiesxyz.ru',
     'http://mesto.front.nomorepartiesxyz.ru',
-    'http://localhost:3000',
+    'http://localhost:3001',
   ],
   credentials: true,
   optionsSuccessStatus: 200,
