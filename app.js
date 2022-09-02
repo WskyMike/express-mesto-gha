@@ -13,12 +13,17 @@ const { PORT = 3000 } = process.env;
 // CORS
 const cors = require('cors');
 
-// const corsOptions = {
-//   origin: 'https://mesto.front.nomorepartiesxyz.ru',
-//   credentials: true,
-// };
+const corsOptions = {
+  origin: [
+    'https://mesto.front.nomorepartiesxyz.ru',
+    'http://mesto.front.nomorepartiesxyz.ru',
+    'http://localhost:3000',
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
 
-app.use(cors()); // если не указать corsOptions, то запросы смогут слать все
+app.use(cors(corsOptions)); // если не указать corsOptions, то запросы смогут слать все
 
 // app.use(cookieParser());
 app.use(bodyParser.json());
@@ -87,7 +92,9 @@ app.use((err, req, res, next) => {
 
 // Подключение к MongoDB
 async function connection() {
-  await mongoose.connect('mongodb://localhost:27017/mestodb');
+  await mongoose.connect('mongodb://localhost:27017/mestodb', {
+    useNewUrlParser: true,
+  });
   console.log('Connected to DB');
   await app.listen(PORT);
   console.log(`Example app listening on port ${PORT}`);
