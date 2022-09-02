@@ -13,18 +13,6 @@ const { PORT = 3000 } = process.env;
 // CORS
 const cors = require('cors');
 
-const corsOptions = {
-  origin: [
-    'https://mesto.front.nomorepartiesxyz.ru',
-    'https://mesto.front.nomorepartiesxyz.ru/',
-    'http://mesto.front.nomorepartiesxyz.ru',
-    'http://localhost:3001',
-  ],
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
-
 // app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -38,9 +26,9 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Сonfiguring headers for protection
-const helmet = require('helmet');
+// const helmet = require('helmet');
 
-app.use(helmet());
+// app.use(helmet());
 
 // Логгирование
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -60,7 +48,7 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.use(cors(corsOptions)); // если не указать corsOptions, то запросы смогут слать все
+app.use(cors()); // если не указать corsOptions, то запросы смогут слать все
 
 app.post('/signin', loginValidation, logIn);
 app.post('/signup', userValidation, createUser);
