@@ -14,7 +14,7 @@ const { PORT = 3000 } = process.env;
 const cors = require('cors');
 
 const corsOptions = {
-  origin: 'http://localhost:3001',
+  origin: 'https://mesto.front.nomorepartiesxyz.ru',
   credentials: true,
 };
 
